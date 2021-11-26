@@ -310,9 +310,6 @@ map <silent> <leader><CR> :nohlsearch<CR>
 " Remove the Windows ^M - when the encodings gets messed up
 noremap <leader>m mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
 
-nnoremap <leader>ss :mksession! ~/.vim/session/default.session.vim<CR>
-nnoremap <leader>ls :source ~/.vim/session/default.session.vim<CR>
-
 nnoremap <leader>ev :new $MYVIMRC<CR>
 nnoremap <leader>ez :new ~/.zshrc<CR>
 
@@ -366,12 +363,6 @@ map <leader>cd :lcd %:p:h<CR>:pwd<CR>
 
 autocmd FocusGained,BufEnter * checktime
 autocmd InsertEnter,InsertLeave * set cursorline!
-
-
-"autocmd VimEnter * source ~/.vim/session/tmp.session.vim<CR>
-"autocmd VimLeave * mksession! ~/.vim/session/tmp.session.vim
-
-"autocmd bufwritepost $MYVIMRC source $MYVIMRC
 
 " Do not use smart case in command line mode, extracted from https://vi.stackexchange.com/a/16511/15292.
 augroup dynamic_smartcase
