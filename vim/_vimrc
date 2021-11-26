@@ -1,0 +1,515 @@
+"""vim: set foldmethod=marker foldlevel=0 nomodeline:
+" ============================================================================
+" .vimrc of Peter Song {{{
+" ============================================================================
+
+" Vim 8 defaults
+unlet! skip_defaults_vim
+silent! source $VIMRUNTIME/defaults.vim
+
+let g:is_win = (has('win16') || has('win32') || has('win64')) ? v:true : v:false
+let g:is_linux = (has('unix') && !has('macunix')) ? v:true : v:false
+let g:is_mac = (has('macunix') || has('mac')) ? v:true : v:false
+
+let g:is_nvim = has('nvim') ? v:true : v:false
+let g:is_gui = has('gui_running') ? v:true : v:false
+let g:is_gui_macvim = has('gui_macvim') ? v:true : v:false
+
+
+" With a map leader it's possible to do extra key combinations
+let mapleader=" "
+let g:mapleader=" "
+
+let g:loaded_perl_provider     = 0
+let g:loaded_ruby_provider     = 0
+let g:loaded_zipPlugin         = 1
+let g:loaded_zip               = 1
+let g:loaded_tarPlugin         = 1
+let g:loaded_tar               = 1
+let loaded_gzip                = 1
+let g:loaded_tutor_mode_plugin = 1
+
+let g:netrw_banner       = 0
+let g:netrw_keepdir      = 0
+let g:netrw_liststyle    = 3
+let g:netrw_sort_options = 'i'
+let g:netrw_list_hide    = netrw_gitignore#Hide() . '.*\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\.\.\=/\=$'
+
+
+" }}}
+" ============================================================================
+" VIM-PLUG BLOCK {{{
+" ============================================================================
+
+" vim plugin management tool
+" vim-plug https://github.com/junegunn/vim-plug
+
+" PlugInstall     " Install plugins
+" PlugUpdate      " Install or update plugins
+" PlugUpgrade     " upgrade vim-plug itself
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'yianwillis/vimcdoc'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+    " CTRL-T, Open in 'Tab split'
+    " CTRL-X, Open in 'split'
+    " CTRL-V, Open in 'vsplit'
+    let $FZF_DEFAULT_OPTS .= '--reverse --inline-info'
+    "let g:fzf_layout = { 'window': '-tabnew' }
+    let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
+    let g:fzf_preview_window = ['right:50%', 'ctrl-/']
+    let g:fzf_colors =
+    \ { 'fg':         ['fg', 'Normal'],
+      \ 'bg':         ['bg', 'Normal'],
+      \ 'preview-bg': ['bg', 'NormalFloat'],
+      \ 'hl':         ['fg', 'Comment'],
+      \ 'fg+':        ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+      \ 'bg+':        ['bg', 'CursorLine', 'CursorColumn'],
+      \ 'hl+':        ['fg', 'Statement'],
+      \ 'info':       ['fg', 'PreProc'],
+      \ 'border':     ['fg', 'Ignore'],
+      \ 'prompt':     ['fg', 'Conditional'],
+      \ 'pointer':    ['fg', 'Exception'],
+      \ 'marker':     ['fg', 'Keyword'],
+      \ 'spinner':    ['fg', 'Label'],
+      \ 'header':     ['fg', 'Comment'] }
+    "let g:fzf_history_dir = '~/.local/share/fzf-history'
+    nnoremap <leader>f :Files<CR>
+    nnoremap <leader>b :Buffers<CR>
+Plug 'preservim/nerdcommenter'
+"Plug 'scrooloose/nerdtree'
+    "nnoremap <C-t> :NERDTreeToggle<CR>
+    "nnoremap <C-f> :NERDTreeFind<CR>
+Plug 'easymotion/vim-easymotion'
+    " Turn on case-insensitive feature
+    let g:EasyMotion_smartcase = 1
+    nmap s <Plug>(easymotion-s2)
+    nmap <leader>s <Plug>(easymotion-sn)
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-fugitive' " git wrapper
+Plug 'ssh://git.amazon.com:2222/pkg/Vim-code-browse', {'branch': 'mainline'}
+Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
+    let g:pymode_python = 'python3'
+    let g:pymode = 1
+    let g:pymode_syntax = 1
+    let g:pymode_syntax_all = 1
+    let g:pymode_syntax_slow_sync = 1
+    let g:pymode_trim_whitespaces = 0
+    let g:pymode_options = 1
+    let g:pymode_options_max_line_length = 160
+    let g:pymode_options_colorcolumn = 1
+    let g:pymode_indent = 1
+    let g:pymode_lint = 1
+    let g:pymode_lint_ignore = []
+    let g:pymode_motion = 1
+    let g:pymode_rope = 0
+    let g:pymode_rope_regenerate_on_write = 0
+    let g:pymode_rope_completion = 0
+    let g:pymode_rope_complete_on_dot = 0
+    let g:pymode_rope_lookup_project = 0
+    let g:pymode_breakpoint = 0
+Plug 'davidhalter/jedi-vim'
+    " Autocomplete
+    let g:jedi#goto_stubs_command = ''
+Plug 'conradirwin/vim-bracketed-paste'
+    "enables transparent pasting into vim. (i.e. no more :set paste!)
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+    " Multiple cursors plugin
+    " Basic usage:
+    "   - select words with Ctrl-N (like Ctrl-d in Sublime Text/VS Code)
+    "   - create cursors vertically with Ctrl-Down/Ctrl-Up
+    "   - select one character at a time with Shift-Arrows
+    "   - press n/N to get next/previous occurrence
+    "   - press [/] to select next/previous cursor
+    "   - press q to skip current and get next occurrence
+    "   - press Q to remove current cursor/selection
+    "   - start insert mode with i,a,I,A
+Plug 'ervandew/supertab' " use <Tab> for all your insert completion needs (:help ins-completion)
+Plug 'tmsvg/pear-tree' "auto-pair plugin
+Plug 'mechatroner/rainbow_csv'
+    nnoremap <leader>fdt :set ft=csv_semicolon<CR> <bar> :RainbowAlign<CR>
+Plug 'rafi/awesome-vim-colorschemes'
+Plug 'lifepillar/vim-gruvbox8'
+Plug 'itchyny/lightline.vim' " status line
+Plug 'elzr/vim-json'
+Plug 'godlygeek/tabular' " line up text
+Plug 'plasticboy/vim-markdown'
+    let g:vim_markdown_folding_disabled = 1
+    let g:vim_markdown_strikethrough = 1
+    let g:vim_markdown_math = 1
+    let g:vim_markdown_folding_style_pythonic = 1
+    let g:vim_markdown_toc_autofit = 1
+    let g:vim_markdown_json_frontmatter = 1
+    let g:vim_markdown_no_extensions_in_markdown = 1
+    let g:vim_markdown_edit_url_in = 'tab'
+    set conceallevel=2
+"Plug 'gelguy/wilder.nvim'
+Plug 'mhinz/vim-startify'
+Plug 'airblade/vim-current-search-match'
+"Plug 'vim/killersheep'
+"Plug 'prabirshrestha/vim-lsp'
+"Plug 'mattn/vim-lsp-settings'
+    " :LspInstallServer   "While editing a file with a supported filetype
+"Plug 'prabirshrestha/asyncomplete.vim'
+"Plug 'prabirshrestha/asyncomplete-lsp.vim'
+
+call plug#end()
+
+""""""""""""""""""""""""""""""wilder.nvim settings""""""""""""""""""""""""""""""
+
+" }}}
+"
+" ============================================================================
+" BASIC SETTINGS {{{
+" ============================================================================
+
+set nobackup
+set nofsync
+set nostartofline
+set noswapfile
+set nowritebackup
+set nowrapscan
+
+set helplang=cn
+
+set encoding=utf-8
+set ambiwidth=double
+set fileencodings=ucs-bom,utf-8,cp936,cp18030,big5,euc-jp,euc-kr,latin1
+set fileformats=unix,dos,mac
+
+set complete=".,w,b,u,t"
+
+set expandtab smarttab shiftround
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+
+set wrap
+set showbreak=↪
+set whichwrap+=<,>,[,]
+
+set matchpairs+=<:>,「:」,『:』,【:】,“:”,‘:’,《:》
+
+set autoread
+set cursorline
+set autoindent smartindent
+set number relativenumber
+set ignorecase smartcase hlsearch incsearch
+
+set wildignore+=*.o,*.obj,*.dylib,*.bin,*.dll,*.exe
+set wildignore+=*/.git/*,*/.svn/*,*/__pycache__/*,*/build/**
+set wildignore+=*.jpg,*.png,*.jpeg,*.bmp,*.gif,*.tiff,*.svg,*.ico
+set wildignore+=*.pyc,*.pkl
+set wildignore+=*.DS_Store
+set wildignore+=*.aux,*.bbl,*.blg,*.brf,*.fls,*.fdb_latexmk,*.synctex.gz,*.xdv
+set wildignorecase
+
+set belloff=all
+set foldcolumn=1
+set laststatus=2
+set scrolloff=1
+set virtualedit=block
+
+set list
+set listchars=eol:$,tab:>-,trail:-,nbsp:+
+
+if g:is_mac
+    set clipboard+=unnamed
+else
+    set clipboard+=unnamedplus
+endif
+
+if g:is_gui
+    set background=dark
+    let g:gruvbox_italics=1
+    let g:gruvbox_italicize_strings=1
+    let g:gruvbox_filetype_hi_groups = 1
+    let g:gruvbox_plugin_hi_groups = 1
+    colorscheme gruvbox8_hard
+
+    set guifont=InputMono-Regular:h12
+    "set guifont=UbuntuMono-Regular:h13
+    "set guifont=FiraCode-Regular:h13
+    "set guifontwide=Source\ Han\ Sans:h12
+endif
+
+if has('gui_macvim')
+    set macligatures
+    set guioptions+=a
+    set guioptions-=r
+    set guioptions-=e "use non-GUI tab pages line
+    set guitablabel=%M%t\ \ %Ngt
+    set antialias
+endif
+
+
+" }}}
+" ============================================================================
+" Mapping {{{
+" ============================================================================
+
+inoremap jk <ESC>
+xnoremap jk <ESC>
+cnoremap jk <C-c>
+
+map 0 ^
+
+" Visual mode pressing * or # searches for the current selection
+vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
+
+" Center screen when jumping to next match
+nnoremap n nzz
+nnoremap N Nzz
+vnoremap n nzz
+vnoremap N Nzz
+
+vnoremap < <gv
+vnoremap > >gv
+
+" Change text without putting it into the vim register,
+nnoremap c "_c
+nnoremap C "_C
+nnoremap cc "_cc
+xnoremap c "_c
+nnoremap x "_x
+
+" move vertically by visual line
+nnoremap j gj
+nnoremap k gk
+nnoremap B ^
+nnoremap E $
+
+" Move a line of text using ALT+[jk] or Command+[jk] on mac
+nmap <M-j> mz:m+<CR>`z
+nmap <M-k> mz:m-2<CR>`z
+vmap <M-j> :m'>+<CR>`<my`>mzgv`yo`z
+vmap <M-k> :m'<-2<CR>`>my`<mzgv`yo`z
+
+if (g:is_mac)
+    nmap <D-j> <M-j>
+    nmap <D-k> <M-k>
+endif
+
+inoremap <C-s>     <C-O>:update<CR>
+nnoremap <C-s>     :update<CR>
+nnoremap <leader>w :update<CR>
+
+inoremap <C-Q>     <ESC>:q<CR>
+nnoremap <C-Q>     :q<CR>
+vnoremap <C-Q>     <ESC>
+nnoremap <leader>q :q<CR>
+nnoremap <leader>Q :qa!<CR>
+
+" Disable highlight when <leader><CR> is pressed
+map <silent> <leader><CR> :nohlsearch<CR>
+
+" Remove the Windows ^M - when the encodings gets messed up
+noremap <leader>m mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
+
+nnoremap <leader>ss :mksession! ~/.vim/session/default.session.vim<CR>
+nnoremap <leader>ls :source ~/.vim/session/default.session.vim<CR>
+
+nnoremap <leader>ev :new $MYVIMRC<CR>
+nnoremap <leader>ez :new ~/.zshrc<CR>
+
+" ----------------------------------------------------------------------------
+" Windows mapping
+" ----------------------------------------------------------------------------
+" <tab> / <s-tab> | Circular windows navigation
+nnoremap <tab>   <c-w>w
+nnoremap <S-tab> <c-w>W
+
+" ----------------------------------------------------------------------------
+" Tabs mapping
+" ----------------------------------------------------------------------------
+map <leader>1 1gt
+map <leader>2 2gt
+map <leader>3 3gt
+map <leader>4 4gt
+map <leader>5 5gt
+
+nmap <C-1> <leader>1
+nmap <C-2> <leader>2
+nmap <C-3> <leader>3
+nmap <C-4> <leader>4
+nmap <C-5> <leader>5
+
+if (g:is_mac)
+  nmap <D-1> <leader>1
+  nmap <D-2> <leader>2
+  nmap <D-3> <leader>3
+  nmap <D-4> <leader>4
+  nmap <D-5> <leader>5
+endif
+
+nnoremap ]t :tabn<CR>
+nnoremap [t :tabp<CR>
+
+" ----------------------------------------------------------------------------
+" Buffers mapping
+" ----------------------------------------------------------------------------
+nnoremap <silent> bd :bdelete<CR>
+nnoremap ]b :bnext<CR>
+nnoremap [b :bprev<CR>
+
+" Switch CWD to the directory of the open buffer
+map <leader>cd :lcd %:p:h<CR>:pwd<CR>
+
+" }}}
+" ============================================================================
+" AUTOCMD {{{
+" ============================================================================
+
+autocmd FocusGained,BufEnter * checktime
+autocmd InsertEnter,InsertLeave * set cursorline!
+
+
+"autocmd VimEnter * source ~/.vim/session/tmp.session.vim<CR>
+"autocmd VimLeave * mksession! ~/.vim/session/tmp.session.vim
+
+"autocmd bufwritepost $MYVIMRC source $MYVIMRC
+
+" Do not use smart case in command line mode, extracted from https://vi.stackexchange.com/a/16511/15292.
+augroup dynamic_smartcase
+  autocmd!
+  autocmd CmdLineEnter : set nosmartcase
+  autocmd CmdLineLeave : set smartcase
+augroup END
+
+"augroup term_settings
+  "autocmd!
+  "" Do not use number and relative number for terminal inside nvim
+  "autocmd TermOpen * setlocal norelativenumber nonumber
+  "" Go to insert mode by default to start typing command
+  "autocmd TermOpen * startinsert
+"augroup END
+
+
+augroup highlight_yank
+  autocmd!
+  au TextYankPost * silent! lua vim.highlight.on_yank{higroup="YankColor", timeout=300, on_visual=false}
+augroup END
+
+"augroup wilder_init
+"  autocmd!
+"  autocmd CursorHold * ++once call s:wilder_init()
+"augroup END
+"
+
+"augroup ProjectDrawer
+  "autocmd!
+  "autocmd VimEnter * :Vexplore
+"augroup END
+
+" }}}
+" ============================================================================
+" Functions {{{
+" ============================================================================
+
+" Delete trailing white space on save, useful for some filetypes ;)
+fun! CleanExtraSpaces()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    silent! %s/\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfun
+
+" Don't close window, when deleting a buffer
+command! Bclose call <SID>BufcloseCloseIt()
+function! <SID>BufcloseCloseIt()
+    let l:currentBufNum = bufnr("%")
+    let l:alternateBufNum = bufnr("#")
+
+    if buflisted(l:alternateBufNum)
+        buffer #
+    else
+        bnext
+    endif
+
+    if bufnr("%") == l:currentBufNum
+        new
+    endif
+
+    if buflisted(l:currentBufNum)
+        execute("bdelete! ".l:currentBufNum)
+    endif
+endfunction
+
+function! CmdLine(str)
+    call feedkeys(":" . a:str)
+endfunction
+
+function! VisualSelection(direction, extra_filter) range
+    let l:saved_reg = @"
+    execute "normal! vgvy"
+
+    let l:pattern = escape(@", "\\/.*'$^~[]")
+    let l:pattern = substitute(l:pattern, "\n$", "", "")
+
+    if a:direction == 'gv'
+        call CmdLine("Ack '" . l:pattern . "' " )
+    elseif a:direction == 'replace'
+        call CmdLine("%s" . '/'. l:pattern . '/')
+    endif
+
+    let @/ = l:pattern
+    let @" = l:saved_reg
+endfunction
+
+" print the message to the new tab page.
+function! TabMsg(cmd)
+  redir => message
+  silent execute a:cmd
+  redir END
+  if empty(message)
+    echoerr "no output"
+  else
+    " use "new" instead of "tabnew" below if you prefer split windows instead of tabs
+    tabnew
+    setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
+    silent put=message
+  endif
+endfunction
+command! -nargs=+ -complete=command TabMsg call TabMsg(<q-args>)
+
+
+function! s:colors(...)
+  return filter(map(filter(split(globpath(&rtp, 'colors/*.vim'), "\n"),
+        \                  'v:val !~ "^/usr/"'),
+        \           'fnamemodify(v:val, ":t:r")'),
+        \       '!a:0 || stridx(v:val, a:1) >= 0')
+endfunction
+
+function! s:rotate_colors()
+  if !exists('s:colors')
+    let s:colors = s:colors()
+  endif
+  let name = remove(s:colors, 0)
+  call add(s:colors, name)
+  execute 'colorscheme' name
+  redraw
+  echo name
+endfunction
+nnoremap <silent> <F8> :call <SID>rotate_colors()<CR>
+
+function! s:wilder_init() abort
+    call wilder#setup({'modes': [':', '/', '?']})
+    call wilder#set_option('pipeline', [
+        \   wilder#branch(
+        \     wilder#cmdline_pipeline(),
+        \     wilder#search_pipeline(),
+        \   ),
+        \ ])
+    call wilder#set_option('renderer', wilder#wildmenu_renderer({
+        \ 'highlighter': wilder#basic_highlighter(),
+        \ }))
+endfunction
+
+
+" }}}
+
